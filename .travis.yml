@@ -1,0 +1,29 @@
+language: python
+
+services:
+  - docker
+
+matrix:
+  include:
+    - python: 3.7
+      env: TOXENV=py37
+    - python: 3.8
+      env: TOXENV=py38,flake8,mypy,black,isort,clean,report
+
+
+install:
+  - pip install poetry
+  - poetry install
+
+script: tox && codecov
+
+
+deploy:
+  - provider: script
+    script:
+      poetry publish --username $PYPI_USERNAME --password $PYPI_PASSWORD --build
+    on:
+      python: 3.8
+      branch: master
+      repo: ghsang/dockontext
+      tags: true
