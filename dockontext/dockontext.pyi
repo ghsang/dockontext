@@ -1,11 +1,19 @@
 # isort:skip_file
 
-from typing import AsyncGenerator, Optional, Protocol
+from typing import AsyncGenerator, Awaitable, Callable, Optional, Protocol
 
 class Result(Protocol):
     returncode: Optional[int]
     stdout: str
     stderr: str
+
+class Config(Protocol):
+    name: str
+    image: str
+    init_timeo: float = ...
+    stop_timeo: float = ...
+    args: str = ...
+    entry_cmd: str = ...
 
 class Container(Protocol):
     def __init__(self, name: str): ...
@@ -14,11 +22,7 @@ class Container(Protocol):
     async def ip(self, timeo: float) -> str: ...
 
 async def container_generator_from_image(
-    name: str,
-    image: str,
-    init_timeo: float,
-    stop_timeo: float,
-    args: str = ...,
+    cfg: Config,
 ) -> AsyncGenerator[Container, None]: ...
 
 class CreationFailed(Exception):

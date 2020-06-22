@@ -3,7 +3,6 @@ tox
 pytest
 pytest-xdist
 pytest-cov
-pytest-asyncio
 mypy
 pyflakes
 black

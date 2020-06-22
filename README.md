@@ -13,31 +13,18 @@
 
 ### Example
 
-#### with pytest.fixture (pytest-asyncio required)
+#### pytest.fixture
 ```
 import pytest
-from dockontext import container_generator_from_image, Result
+from dockontext import container_generator_from_image, Result, Config
 
-docker_context = pytest.fixture(container_generator_from_image)
+create_container = pytest.fixture(container_generator_from_image)
 
-@pytest.mark.asyncio
-async def test_fixture(docker_context):
-     container = docker_context(name, "alpine:latest")
-     result = await container.execute("echo hello", timeout: float)
+def test_fixture(create_container):
+     config = Config(name, "alpine:latest")
+     container = create_container(config)
+     result = container.execute("echo hello", timeout: float)
      assert result == Result(returncode=0, stdout="hello\n", stderr="")
-```
-
-#### with contextlib.asynccontextmanager
-```
-from contextlib import asynccontextmanager
-from dockontext import container_generator_from_image, Result
-
-
-docker_context = asynccontextmanager(container_generator_from_image)
-
-async with docker_context(name, "alpine:latest") as container:
-    result = await container.execute("echo hello", timeout: float)
-    assert result == Result(returncode=0, stdout="hello\n", stderr="")
 ```
 
 

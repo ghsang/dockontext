@@ -1,11 +1,11 @@
-import asyncio
 import random
 import string
-from contextlib import asynccontextmanager
+from subprocess import TimeoutExpired
 
 import pytest  # type: ignore
 
 from dockontext.dockontext import (
+    Config,
     Container,
     CreationFailed,
     Result,
@@ -13,74 +13,65 @@ from dockontext.dockontext import (
     container_generator_from_image,
 )
 
-
-@pytest.mark.asyncio
-async def test_run():
-    assert await _run("echo hello", 0.1) == Result(0, "hello", "")
+create_container = pytest.fixture(container_generator_from_image)
 
 
-@pytest.mark.asyncio
-async def test_run_timeout():
+def test_run():
+    assert _run("echo hello", 0.1) == Result(0, "hello", "")
+
+
+def test_run_timeout():
     from dockontext.dockontext import _run
 
-    with pytest.raises(asyncio.TimeoutError):
-        assert await _run("sleep 0.2", 0.1)
+    with pytest.raises(TimeoutExpired):
+        assert _run("sleep 0.2", 0.1)
 
-    assert await _run("sleep 0.1", 0.2)
-
-
-@pytest.mark.asyncio
-async def test_container_generator_from_image():
-
-    context = asynccontextmanager(container_generator_from_image)
-
-    async with context(_random_string(), "alpine", 300.0, 60.0) as container:
-        assert await container.execute("echo hello", 5.0) == Result(
-            0, "hello", ""
-        )
+    assert _run("sleep 0.1", 0.2)
 
 
-@pytest.mark.asyncio
-async def test_container_generator_from_image_creation_failure():
+def test_container_generator_from_image(create_container):
+    container = create_container(_config())
+    assert container.execute("echo hello", 5.0) == Result(0, "hello", "")
 
-    context = asynccontextmanager(container_generator_from_image)
+
+def test_container_generator_from_image_creation_failure(create_container):
 
     with pytest.raises(CreationFailed) as e:
-        async with context(_random_string(), "invalid_image", 300.0, 60.0):
-            pass
+        create_container(_config(image="invalid_image"))
     assert str(e.value).startswith("dockercontext failed to create container")
 
 
-@pytest.mark.asyncio
-async def test_container_close():
+def test_container_close():
 
     name = _random_string()
     container = Container(name)
 
-    created = await _run(
+    created = _run(
         f"docker run -d --name {container.name} alpine " "tail -f /dev/null",
         300.0,
     )
 
-    async def exist():
-        res = await _run(f"docker container inspect {container.name}", 300.0)
+    def exist():
+        res = _run(f"docker container inspect {container.name}", 300.0)
         return res.returncode == 0
 
-    assert created.returncode == 0 and await exist()
+    assert created.returncode == 0 and exist()
 
-    await container.close(60.0)
+    container.close()
 
-    assert not await exist()
+    assert not exist()
 
 
-@pytest.mark.asyncio
-async def test_container_ip():
+def test_container_ip(create_container):
+    container = create_container(_config())
+    ip = container.ip()
+    assert len(ip.split(".")) == 4
 
-    context = asynccontextmanager(container_generator_from_image)
 
-    async with context(_random_string(), "alpine", 300.0, 60.0) as container:
-        ip = await container.ip(60.0)
-        assert len(ip.split(".")) == 4
+def _config(image="alpine"):
+    return Config(
+        name=_random_string(), image=image, entry_cmd="tail -f /dev/null"
+    )
 
 
 def _random_string():
