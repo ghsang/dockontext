@@ -8,7 +8,7 @@ matrix:
     - python: 3.7
       env: TOXENV=py37
     - python: 3.8
-      env: TOXENV=py38,flake8,mypy,black,isort,clean,report
+      env: TOXENV=py38,pyflakes,mypy,black,isort,clean,report
 
 
 install:
