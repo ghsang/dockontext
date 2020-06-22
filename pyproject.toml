@@ -16,7 +16,7 @@ known_first_party = "dockontext"
 
 [tool.poetry]
 name = "dockontext"
-version = "0.1.0"
+version = "0.1.1"
 description = "context manager that runs and closes docker containers"
 authors = ["Hyuksang Gwon <gwonhyuksang@gmail.com>"]
 license = "MIT"
