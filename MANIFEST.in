@@ -3,6 +3,7 @@ include CONTRIBUTING.md
 include HISTORY.md
 include LICENSE
 include README.md
+include dockontext/py.typed
 
 recursive-include feature *
 recursive-exclude * __pycache__

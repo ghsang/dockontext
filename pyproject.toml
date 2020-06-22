@@ -23,7 +23,7 @@ license = "MIT"
 repository = "https://github.com/ghsang/dockontext"
 keywords = ["docker"]
 readme = "README.md"
-include = ["README.md", "dockontext/py.typed"]
+include = ["dockontext/py.typed", "MANIFEST.in"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
