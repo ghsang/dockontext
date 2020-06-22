@@ -16,14 +16,14 @@ known_first_party = "dockontext"
 
 [tool.poetry]
 name = "dockontext"
-version = "0.1.1"
+version = "0.1.2"
 description = "context manager that runs and closes docker containers"
 authors = ["Hyuksang Gwon <gwonhyuksang@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/ghsang/dockontext"
 keywords = ["docker"]
 readme = "README.md"
-include = ["README.md"]
+include = ["README.md", "dockontext/py.typed"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
